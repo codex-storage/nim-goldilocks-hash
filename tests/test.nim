@@ -7,5 +7,7 @@
 #import ./poseidon2/testReadme
 
 import ./poseidon2/testField
+import ./poseidon2/testPermutation
+import ./poseidon2/testCompress
 
 {.warning[UnusedImport]: off.}

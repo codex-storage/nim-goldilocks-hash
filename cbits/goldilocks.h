@@ -13,20 +13,11 @@ uint64_t goldilocks_sub(uint64_t x, uint64_t y);
 uint64_t goldilocks_mul(uint64_t x, uint64_t y);
 uint64_t goldilocks_mul_small(uint64_t x, uint32_t y);
 
-uint64_t goldilocks_div_by_2(uint64_t x);
-uint64_t goldilocks_div_by_3(uint64_t x);
-uint64_t goldilocks_div_by_4(uint64_t x);
-
-uint64_t goldilocks_add3(uint64_t x, uint64_t y, uint64_t z);
-
-//uint64_t goldilocks_rdc(__uint128_t x);
-
 //------------------------------------------------------------------------------
 
 void goldilocks_poseidon2_permutation(uint64_t *state);
-void goldilocks_monolith_permutation (uint64_t *state);
 
-void monolith_print_sbox_table();
-void monolith_print_sbox_table_c_format();
+void goldilocks_poseidon2_keyed_compress(const uint64_t *x, const uint64_t *y, uint64_t key, uint64_t *out);
+void goldilocks_poseidon2_compress      (const uint64_t *x, const uint64_t *y,               uint64_t *out);
 
 //------------------------------------------------------------------------------

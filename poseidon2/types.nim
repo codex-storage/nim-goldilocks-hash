@@ -26,4 +26,10 @@ type F12* = array[12, F]
 type Digest* = distinct F4
 type State*  = distinct F12
 
+func fromDigest* (x : Digest): F4  = return F4(x)  
+func fromState * (x : State):  F12 = return F12(x) 
+
+func toDigest* (x : F4 ): Digest = Digest(x)
+func toState*  (x : F12): State  = State(x)
+
 #-------------------------------------------------------------------------------

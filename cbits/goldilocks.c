@@ -396,7 +396,7 @@ void goldilocks_poseidon2_permutation(uint64_t *state) {
 
 // compression function: input is two 4-element vector of field elements, 
 // and the output is a vector of 4 field elements
-void goldilocks_poseidon2_keyed_compress(uint64_t key, const uint64_t *x, const uint64_t *y, uint64_t *out) {
+void goldilocks_poseidon2_keyed_compress(const uint64_t *x, const uint64_t *y, uint64_t key, uint64_t *out) {
   uint64_t state[12];
   for(int i=0; i<4; i++) {
     state[i  ] = x[i];
@@ -411,7 +411,7 @@ void goldilocks_poseidon2_keyed_compress(uint64_t key, const uint64_t *x, const 
 }
 
 void goldilocks_poseidon2_compress(const uint64_t *x, const uint64_t *y, uint64_t *out) {
-  goldilocks_poseidon2_keyed_compress(0, x, y, out);
+  goldilocks_poseidon2_keyed_compress(x, y, 0, out);
 }
 
 //------------------------------------------------------------------------------
