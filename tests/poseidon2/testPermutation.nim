@@ -5,6 +5,8 @@ import std/unittest
 import poseidon2/types
 import poseidon2/permutation
 
+import ./permTestCases
+
 #-------------------------------------------------------------------------------
 
 const refInp: F12 = 
@@ -46,5 +48,13 @@ suite "permutation":
     var output = perm(input);
     check fromState(output) == refOut
 
+  test "more permutation tests":
+    var ok = true
+    for (xs,ys) in testcases_perm:
+      if permF12(xs) != ys: 
+        ok = false
+        break
+    check ok
+ 
 #-------------------------------------------------------------------------------
 

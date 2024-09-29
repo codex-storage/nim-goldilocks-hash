@@ -14,8 +14,11 @@ import Constants
 
 type State = Array Int F
 
+listToState :: [F] -> State
+listToState = listArray (0,11)
+
 zeroState :: State
-zeroState = listArray (0,11) (replicate 12 0)
+zeroState = listToState (replicate 12 0)
 
 --------------------------------------------------------------------------------
 
