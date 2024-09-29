@@ -10,6 +10,7 @@ import Prelude hiding ( div )
 import qualified Prelude
 
 import Data.Bits
+import Data.Word
 import Data.Ratio
 
 import Text.Printf
@@ -17,6 +18,14 @@ import Text.Printf
 --------------------------------------------------------------------------------
 
 type F = Goldilocks
+
+fromF :: F -> Word64
+fromF (Goldilocks x) = fromInteger x
+
+toF :: Word64 -> F
+toF = mkGoldilocks . fromIntegral
+
+--------------------------------------------------------------------------------
 
 newtype Goldilocks 
   = Goldilocks Integer 
