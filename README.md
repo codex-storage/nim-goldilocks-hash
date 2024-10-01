@@ -1,20 +1,29 @@
-Nim/C implementation of Poseidon2 over the Goldilocks field
-===========================================================
+Nim / C implementations of arithmetic hash functions over the Goldilocks field
+==============================================================================
 
-Experimental implementation of the [Poseidon2][1] cryptographic hash function,
-specialized to the Goldilocks field `p = 2^64-2^32+1` and `t = 12`. 
-Uses a C implementation internally.
+Experimental implementation of arithmetic hash functions (like for example [Poseidon2][1])
+specialized to the Goldilocks field `p = 2^64 - 2^32 + 1`. Mostly uses C implementations internally.
 
-The implementation is compatible with Horizen Lab's one at [3]
+Hash functions supported
+------------------------
+
+[x] Poseidon2 (t=12)
+[ ] Monolith (t=12)
+[ ] Tip4' (t=12)
+[ ] Tip5 (t=16)
+
+The Poseidon2 implementation is compatible with Horizen Lab's one at [4].
+The Monolith implementation is compatible with [6].
+
 
 Installation
 ------------
 
-Use the [Nimble][2] package manager to add `poseidon2-goldilocks` to an existing
+Use the [Nimble][3] package manager to add `goldilocks_hash` to an existing
 project. Add the following to its `.nimble` file:
 
 ```nim
-requires "poseidon2-goldilocks >= 0.0.1 & < 0.0.1"
+requires "goldilocks_hash >= 0.0.1 & < 1.0.0"
 ```
 
 Conventions
@@ -23,7 +32,9 @@ Conventions
 Hash digests consist of 4 field elements (approximately 256 bits). 
 
 When constructing binary Merkle trees, we similarly work on units of 4 field 
-elements.
+elements. We use a custom ``safe'' Merkle tree building convention, which ensures
+that different inputs can never produce the same Merkle root (except with 
+negligible probability).
 
 When hashing bytes, first we pad the byte sequence to a multiple of 31 bytes using 
 the `10*` padding strategy, and then we convert each 31 byte piece into 4 field 
@@ -32,15 +43,20 @@ drop-in replacement for the BN254 implementation which also takes 31 bytes at
 a time; and 2) because hashing 31/62 bytes with one permutation is almost 11% 
 more efficient than using only 28/56 bytes at a time.
 
+When hashing field elements, similarly we pad using the `10*` strategy. Domain
+separation ensures that using different sponge rates, or different types of
+input don't produce the same hash.
+
+
 Usage
 -----
 
-Hashing bytes into a field element with the sponge construction:
+Hashing bytes into with the sponge construction:
 ```nim
-import poseidon2_goldilocks
+import goldilocks_hash/poseidon2
 
-let input = [1'u8, 2'u8, 3'u8] # some bytes that you want to hash
-let digest: F = Sponge.digest(input) # a field element
+let input = [1'u8, 2'u8, 3'u8]                 # some bytes that you want to hash
+let digest: Digest = Sponge.digest(input) 
 ```
 
 Converting a hash digest (4 field elements) into bytes:
@@ -50,11 +66,21 @@ let output: array[32, byte] = digest.toBytes
 
 Combining field elements, useful for constructing a binary Merkle tree:
 ```nim
-let left  = Sponge.digest([1'u8, 2'u8, 3'u8])
-let right = Sponge.digest([4'u8, 5'u8, 6'u8])
+let left  = Sponge.digest( [1'u8, 2'u8, 3'u8] )
+let right = Sponge.digest( [4'u8, 5'u8, 6'u8] )
 let combination = compress(left, right)
 ```
 
-[1]: https://eprint.iacr.org/2023/323.pdf
-[2]: https://github.com/nim-lang/nimble
-[3]: https://github.com/HorizenLabs/poseidon2
+Building Merkle trees:
+```nim
+let input: seq[Digest] = ...
+let digest: F = Merkle.digest(input) 
+```
+
+[1]: https://eprint.iacr.org/2023/323
+[2]: https://eprint.iacr.org/2023/1025
+[3]: https://github.com/nim-lang/nimble
+[4]: https://github.com/HorizenLabs/poseidon2
+[5]: https://github.com/HorizenLabs/monolith
+[6]: https://extgit.iaik.tugraz.at/krypto/zkfriendlyhashzoo
+
