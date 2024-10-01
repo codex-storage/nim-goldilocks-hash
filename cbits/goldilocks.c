@@ -1,6 +1,7 @@
 
 #include <stdint.h>
 #include <stdio.h>      // for testing only
+#include <assert.h>
 
 #include "goldilocks.h"
 
@@ -412,6 +413,115 @@ void goldilocks_poseidon2_keyed_compress(const uint64_t *x, const uint64_t *y, u
 
 void goldilocks_poseidon2_compress(const uint64_t *x, const uint64_t *y, uint64_t *out) {
   goldilocks_poseidon2_keyed_compress(x, y, 0, out);
+}
+
+//------------------------------------------------------------------------------
+
+// hash a sequence of field elements into a digest of 4 field elements
+void goldilocks_poseidon2_felts_digest(int rate, int N, const uint64_t *input, uint64_t *hash) {
+  // printf("rate = %d\n",rate);
+  // printf("N    = %d\n",N   );
+
+  assert( (rate >= 1) && (rate <= 8) );
+
+  uint64_t domsep = rate + 256*12 + 65536*63;
+  uint64_t state[12];
+  for(int i=0; i<12; i++) state[i] = 0;
+  state[8] = domsep;
+
+  int nchunks = (N + rate) / rate;       // 10* padding
+  const uint64_t *ptr = input;
+  for(int k=0; k<nchunks-1; k++) {
+    for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] , ptr[j] ); }
+    goldilocks_poseidon2_permutation( state );
+    ptr += rate;
+  }
+
+  int rem = nchunks*rate - N;       // 0 < rem <= rate
+  int ofs = rate - rem; 
+
+  // the last block, with padding
+  uint64_t last[8];
+  for(int i=0    ; i<ofs ; i++) last[i] = ptr[i];
+  for(int i=ofs+1; i<rate; i++) last[i] = 0;
+  last[ofs] = 0x01;
+  for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] , last[j] ); }
+  goldilocks_poseidon2_permutation( state );
+
+  for(int j=0; j<4; j++) { hash[j] = state[j]; }
+}
+
+//--------------------------------------
+
+#define MASK 0x3fffffffffffffffULL
+
+// NOTE: we assume a little-endian architecture
+void goldilocks_convert_31_bytes_to_4_field_elements(const uint8_t *ptr, uint64_t *felts) {
+  const uint64_t *q0  = (const uint64_t*)(ptr   );
+  const uint64_t *q7  = (const uint64_t*)(ptr+ 7);
+  const uint64_t *q15 = (const uint64_t*)(ptr+15);
+  const uint64_t *q23 = (const uint64_t*)(ptr+23);
+
+  felts[0] =  (q0 [0]) & MASK;
+  felts[1] = ((q7 [0]) >> 6) | ((uint64_t)(ptr[15] & 0x0f) << 58);
+  felts[2] = ((q15[0]) >> 4) | ((uint64_t)(ptr[23] & 0x03) << 60); 
+  felts[3] = ((q23[0]) >> 2);
+}
+
+void goldilocks_convert_bytes_to_field_elements(int rate, const uint8_t *ptr, uint64_t *felts) {
+  switch(rate) {
+
+    case 4:
+      goldilocks_convert_31_bytes_to_4_field_elements(ptr, felts);
+      break;
+
+    case 8:
+      goldilocks_convert_31_bytes_to_4_field_elements(ptr   , felts  ); 
+      goldilocks_convert_31_bytes_to_4_field_elements(ptr+31, felts+4);
+      break;
+
+    default:
+      assert( 0 );
+      break;
+  }
+}
+
+void goldilocks_poseidon2_bytes_digest(int rate, int N, const uint8_t *input, uint64_t *hash) {
+  // printf("rate = %d\n",rate);
+  // printf("N    = %d\n",N   );
+
+  assert( (rate == 4) || (rate == 8) );
+
+  uint64_t domsep = rate + 256*12 + 65536*8;
+  uint64_t state[12];
+  for(int i=0; i<12; i++) state[i] = 0;
+  state[8] = domsep;
+
+  uint64_t felts[8];
+
+  int rate_in_bytes  = 31 * (rate>>2);                   // 31 or 62
+  int nchunks = (N + rate_in_bytes) / rate_in_bytes;     // 10* padding
+  const uint8_t *ptr = input;
+  for(int k=0; k<nchunks-1; k++) {
+    goldilocks_convert_bytes_to_field_elements(rate, ptr, felts);
+    for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] , felts[j] ); }
+    goldilocks_poseidon2_permutation( state );
+    ptr += rate_in_bytes;
+  }
+
+  int rem = nchunks*rate_in_bytes - N;       // 0 < rem <= rate_in_bytes 
+  int ofs = rate_in_bytes - rem; 
+  uint8_t last[62];
+
+  // last block, with padding
+  for(int i=0    ; i<ofs          ; i++) last[i] = ptr[i];
+  for(int i=ofs+1; i<rate_in_bytes; i++) last[i] = 0;
+  last[ofs] = 0x01;
+  goldilocks_convert_bytes_to_field_elements(rate, last, felts);
+  for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] ,felts[j] ); }
+  goldilocks_poseidon2_permutation( state );
+
+  for(int j=0; j<4; j++) { hash[j] = state[j]; }
 }
 
 //------------------------------------------------------------------------------

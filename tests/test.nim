@@ -9,5 +9,6 @@
 import ./poseidon2/testField
 import ./poseidon2/testPermutation
 import ./poseidon2/testCompress
+import ./poseidon2/testSponge
 
 {.warning[UnusedImport]: off.}
