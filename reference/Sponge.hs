@@ -30,8 +30,9 @@ import Data.Bits
 import Data.Word
 import Data.List
 
-import Goldilocks
 import Poseidon2
+import Goldilocks
+import Common
 
 --------------------------------------------------------------------------------
 
@@ -48,33 +49,6 @@ splitAndPadSequence r xs = go xs1 where
          (this,rest) -> case rest of
            [] -> [this ++ replicate (r - length this) 0]
            _  -> this : go rest
-
---------------------------------------------------------------------------------
-
-data Digest 
-  = MkDigest !F !F !F !F
-  deriving (Eq,Show)
-
---------------------------------------------------------------------------------
-
-digestToWord64s :: Digest -> [Word64]
-digestToWord64s (MkDigest a b c d) = [ fromF a, fromF b, fromF c, fromF d]
-
-digestToBytes :: Digest -> [Word8]
-digestToBytes = concatMap bytesFromWord64LE . digestToWord64s
-
-bytesFromWord64LE :: Word64 -> [Word8]
-bytesFromWord64LE = go 0 where
-  go 8  _  = []
-  go !k !w = fromIntegral (w .&. 0xff) : go (k+1) (shiftL w 8)
-
-bytesToWord64LE :: [Word8] -> Word64
-bytesToWord64LE = fromInteger . bytesToIntegerLE
-
-bytesToIntegerLE :: [Word8] -> Integer
-bytesToIntegerLE = go where
-  go []          = 0 
-  go (this:rest) = fromIntegral this + 256 * go rest
 
 --------------------------------------------------------------------------------
 
@@ -121,10 +95,6 @@ internalSponge nbits (Rate r) blocks = extractDigest (loop blocks iv) where
   loop list state = case list of
     (this:rest) -> loop rest (step this state)
     []          -> state
-
-extractDigest :: State -> Digest
-extractDigest state = case elems state of 
-  (a:b:c:d:_) -> MkDigest a b c d
 
 addToState :: [F] -> State -> State
 addToState xs arr = listArray (0,11) $ zipWith (+) (xs ++ repeat 0) (elems arr)

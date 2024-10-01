@@ -10,25 +10,13 @@ import Data.List
 
 import System.IO
 
-import Goldilocks
 import Poseidon2
+import Goldilocks
+import Common
+
+import TestGen.Shared
 
 --------------------------------------------------------------------------------
-
-nimShowF :: F -> String
-nimShowF x = "toF( " ++ show x ++ "'u64 )"
-
-nimShowState :: State -> String
-nimShowState xs = "[ " ++ intercalate ", " (map nimShowF (elems xs)) ++ " ]"
-
-nimShowStatePair :: (State,State) -> String
-nimShowStatePair (x,y) = "( " ++ nimShowState x ++ " , " ++ nimShowState y ++ " )"
-
-showListWith :: (a -> String) -> [a] -> [String]
-showListWith f xys = zipWith (++) prefix (map f xys) where
-  prefix = "  [ " : repeat "  , "
-
-----------------------------------------
 
 perms :: String -> (State -> State) -> [State] -> String
 perms varname f xs = unlines (header : stuff ++ footer) where

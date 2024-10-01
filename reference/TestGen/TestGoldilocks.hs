@@ -9,6 +9,8 @@ import System.IO
 
 import Goldilocks
 
+import TestGen.Shared
+
 --------------------------------------------------------------------------------
 
 centered :: Integer -> Integer -> [Integer]
@@ -34,36 +36,17 @@ testFieldPairs = [ (x,y) | x<-list, y<-list ] where
 
 --------------------------------------------------------------------------------
 
-nimShow :: F -> String
-nimShow x = show x ++ "'u64"
-
-nimShowPair :: (F,F) -> String
-nimShowPair (x,y) = "( " ++ nimShow x ++ " , " ++ nimShow y ++ " )"
-
-nimShowTriple :: (F,F,F) -> String
-nimShowTriple (x,y,z) = "( " ++ nimShow x ++ " , " ++ nimShow y ++ " , " ++ nimShow z ++ " )"
-
-showPairs :: [(F,F)] -> [String]
-showPairs xys = zipWith (++) prefix (map nimShowPair xys) where
-  prefix = "  [ " : repeat "  , "
-
-showTriples :: [(F,F,F)] -> [String]
-showTriples xyzs = zipWith (++) prefix (map nimShowTriple xyzs) where
-  prefix = "  [ " : repeat "  , "
-
-----------------------------------------
-
 unary :: String -> (F -> F) -> [F] -> String
 unary varname f xs = unlines (header : stuff ++ footer) where
   header = "const " ++ varname ++ "* : array[" ++ show (length xs) ++ ", tuple[x:uint64, y:uint64]] = " 
   footer = ["  ]",""]
-  stuff  = showPairs [ (x, f x) | x<-xs ]
+  stuff  = nimShowPairs [ (x, f x) | x<-xs ]
 
 binary :: String -> (F -> F -> F) -> [(F,F)] -> String
 binary varname f xys = unlines (header : stuff ++ footer) where
   header = "const " ++ varname ++ "* : array[" ++ show (length xys) ++ ", tuple[x:uint64, y:uint64, z:uint64]] = " 
   footer = ["  ]",""]
-  stuff  = showTriples [ (x, y, f x y) | (x,y)<-xys ]
+  stuff  = nimShowTriples [ (x, y, f x y) | (x,y)<-xys ]
 
 --------------------------------------------------------------------------------
 

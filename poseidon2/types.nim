@@ -7,6 +7,9 @@ type F* = distinct uint64
 
 func fromF* (x: F): uint64 = return uint64(x)
 func toF*   (x: uint64): F = return F(x)
+func toF*   (x: int   ): F = 
+  assert(x >= 0) 
+  return F(uint64(x))
 
 func `==`* (x, y: F): bool =  return (uint64(x) == uint64(y))
 
@@ -33,6 +36,11 @@ func fromState * (x : State):  F12 = return F12(x)
 
 func toDigest* (x : F4 ): Digest = Digest(x)
 func toState*  (x : F12): State  = State(x)
+
+func mkDigestU64* (a,b,c,d: uint64): Digest = toDigest( [toF(a),toF(b),toF(c),toF(d) ] )
+func mkDigest*    (a,b,c,d: F     ): Digest = toDigest( [a,b,c,d] )
+
+const zeroDigest* : Digest = mkDigestU64(0,0,0,0)
 
 func `==`* (x, y: State ): bool = return (fromState(x) == fromState(y))
 func `==`* (x, y: Digest): bool = return (fromDigest(x) == fromDigest(y))

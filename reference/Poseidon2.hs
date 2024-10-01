@@ -9,16 +9,7 @@ import Data.Array.IArray
 
 import Goldilocks
 import Constants
-
---------------------------------------------------------------------------------
-
-type State = Array Int F
-
-listToState :: [F] -> State
-listToState = listArray (0,11)
-
-zeroState :: State
-zeroState = listToState (replicate 12 0)
+import Common
 
 --------------------------------------------------------------------------------
 
