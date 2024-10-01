@@ -1,19 +1,20 @@
 Nim / C implementations of arithmetic hash functions over the Goldilocks field
 ==============================================================================
 
-Experimental implementation of arithmetic hash functions (like for example [Poseidon2][1])
-specialized to the Goldilocks field `p = 2^64 - 2^32 + 1`. Mostly uses C implementations internally.
+Experimental implementation of arithmetic hash functions (like for example 
+[Poseidon2][1] and [Monolith][2]) specialized to the Goldilocks field 
+`p = 2^64 - 2^32 + 1`. Mostly uses C implementations internally.
 
 Hash functions supported
 ------------------------
 
-[x] Poseidon2 (t=12)
-[ ] Monolith (t=12)
-[ ] Tip4' (t=12)
-[ ] Tip5 (t=16)
+- [x] Poseidon2 (t=12)
+- [ ] Monolith (t=12)
+- [ ] Tip4' (t=12)
+- [ ] Tip5 (t=16)
 
-The Poseidon2 implementation is compatible with Horizen Lab's one at [4].
-The Monolith implementation is compatible with [6].
+The Poseidon2 implementation is compatible with [Horizen Lab's one][4].
+The Monolith implementation is compatible with [ZKFriendlyHashZoo][6].
 
 
 Installation
