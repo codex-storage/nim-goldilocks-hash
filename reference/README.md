@@ -2,5 +2,7 @@
 Haskell reference implementation
 --------------------------------
 
-Used for generating test cases (as Nim doesn't support integers larger than 64 bit)
+This is a very inefficient, but easy to read (and check) Haskell implementation 
+of Poseidon2.
 
+We use it for generating test cases for the real implementation.

@@ -1,9 +1,8 @@
 
 import std/unittest
-# import std/sequtils
 
-import poseidon2/types
-import poseidon2/compress
+import goldilocks_hash/types
+import goldilocks_hash/poseidon2/compress
 
 #-------------------------------------------------------------------------------
 
@@ -53,7 +52,7 @@ const refOutKey3: array[4,F] =
 
 #-------------------------------------------------------------------------------
 
-suite "compression":
+suite "poseidon2 compression":
 
   test "compression of [1..4] and [5..8] with key=0":
     let input1 : Digest = toDigest(refInp1)

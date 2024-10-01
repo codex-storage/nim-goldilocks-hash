@@ -10,8 +10,8 @@
 
 #import std/assertions       # on 1.6.18 with an M2 i got "cannot open file: std/assertions" ....
 
-import ./types
-import ./goldilocks
+import ../types
+import ../goldilocks
 import ./permutation
 #import ./io
 

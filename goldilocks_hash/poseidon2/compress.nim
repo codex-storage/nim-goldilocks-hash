@@ -1,5 +1,5 @@
 
-import ./types
+import ../types
 
 proc c_compress(a, b: var Digest, key: uint64, output: var Digest) {. header: "../cbits/goldilocks.h", importc: "goldilocks_poseidon2_keyed_compress", cdecl .}
 

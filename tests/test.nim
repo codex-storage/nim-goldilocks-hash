@@ -1,11 +1,8 @@
-#import ./poseidon2/testSpongeMerkle
-#import ./poseidon2/testIo
-#import ./poseidon2/testReadme
 
-import ./poseidon2/testField
-import ./poseidon2/testPermutation
-import ./poseidon2/testCompress
-import ./poseidon2/testSponge
-import ./poseidon2/testMerkle
+import ./goldilocks_hash/field/testField
+import ./goldilocks_hash/poseidon2/testPermutation
+import ./goldilocks_hash/poseidon2/testCompress
+import ./goldilocks_hash/poseidon2/testSponge
+import ./goldilocks_hash/poseidon2/testMerkle
 
 {.warning[UnusedImport]: off.}

@@ -2,8 +2,8 @@
 import std/unittest
 # import std/sequtils
 
-import poseidon2/types
-import poseidon2/permutation
+import goldilocks_hash/types
+import goldilocks_hash/poseidon2/permutation
 
 import ./permTestCases
 
@@ -41,7 +41,7 @@ const refOut: F12 =
 
 #-------------------------------------------------------------------------------
 
-suite "permutation":
+suite "poseidon2 permutation":
 
   test "permutation of [0..11]":
     var input  = toState(refInp)

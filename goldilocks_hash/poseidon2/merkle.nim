@@ -7,7 +7,7 @@
 # - there is no collision if you remove the bottommost layer (or several layers)
 # - the merkle root of the singleton is not itself
 
-import ./types
+import ../types
 import ./compress
 #import ./io
 

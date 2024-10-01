@@ -2,8 +2,8 @@
 import std/unittest
 # import std/sequtils
 
-import poseidon2/types
-import poseidon2/sponge
+import goldilocks_hash/types
+import goldilocks_hash/poseidon2/sponge
 
 import ./spongeTestCases
 
@@ -29,7 +29,7 @@ func isOkFeltNim(r: static int, testcases: openarray[tuple[n:int,digest:F4]] ): 
       ok = false
   return ok
 
-suite "sponge/Nim":
+suite "poseidon2 sponge /Nim":
 
   test "sponge for field elements w/ rate = 1": check isOkFeltNim( 1 , testcases_field_rate1 )
   test "sponge for field elements w/ rate = 2": check isOkFeltNim( 2 , testcases_field_rate2 )
@@ -58,7 +58,7 @@ func isOkBytesC(r: static int, testcases: openarray[tuple[n:int,digest:F4]] ): b
       ok = false
   return ok
 
-suite "sponge/C":
+suite "poseidon2 sponge /C":
 
   test "sponge for field elements w/ rate = 1": check isOkFeltC( 1 , testcases_field_rate1 )
   test "sponge for field elements w/ rate = 2": check isOkFeltC( 2 , testcases_field_rate2 )

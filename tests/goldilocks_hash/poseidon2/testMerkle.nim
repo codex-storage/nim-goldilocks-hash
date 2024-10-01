@@ -2,8 +2,8 @@
 import std/unittest
 # import std/sequtils
 
-import poseidon2/types
-import poseidon2/merkle
+import goldilocks_hash/types
+import goldilocks_hash/poseidon2/merkle
 
 import ./merkleTestCases
 
@@ -24,7 +24,7 @@ func isOkDigestNim( testcases: openarray[tuple[n:int,digest:F4]] ): bool =
       ok = false
   return ok
 
-suite "merkle/Nim":
+suite "poseidon2 merkle tree /Nim":
 
   test "merkle root of digest sequences": check isOkDigestNim( testcases_merkleroot )
  

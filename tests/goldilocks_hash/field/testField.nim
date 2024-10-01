@@ -2,14 +2,14 @@
 import std/unittest
 # import std/sequtils
 
-import poseidon2/types
-import poseidon2/goldilocks
+import goldilocks_hash/types
+import goldilocks_hash/goldilocks
 
 import ./fieldTestCases
 
 #-------------------------------------------------------------------------------
 
-suite "field":
+suite "the Goldilocks field":
 
   test "negation":
     var ok = true
