@@ -12,8 +12,8 @@ Hash functions supported
 - [x] Monolith with `t=12`
 - [ ] Tip4' with `t=12`
 
-The Poseidon2 implementation is compatible with [Horizen Lab's one][4].
-The Monolith implementation is compatible with [ZKFriendlyHashZoo][6].
+The Poseidon2 permutation is compatible with [Horizen Lab's one][4].
+The Monolith permutation is compatible with [ZKFriendlyHashZoo][6].
 
 
 Installation
