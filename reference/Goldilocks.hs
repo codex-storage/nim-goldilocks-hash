@@ -45,6 +45,9 @@ instance Num Goldilocks where
   abs    = id
   signum _ = Goldilocks 1
 
+square :: F -> F
+square x = x*x
+
 instance Fractional Goldilocks where
   fromRational y = fromInteger (numerator y) `div` fromInteger (denominator y)
   recip  = inv

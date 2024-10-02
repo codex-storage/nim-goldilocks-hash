@@ -20,7 +20,7 @@ module Merkle where
 
 import Data.Array
 
-import Poseidon2
+import Permutations
 import Goldilocks
 import Common
 
@@ -30,16 +30,16 @@ type Key = Int
 
 --------------------------------------------------------------------------------
 
-compress :: Digest -> Digest -> Digest
-compress (MkDigest a b c d) (MkDigest p q r s) = extractDigest output where
+compress :: Hash -> Digest -> Digest -> Digest
+compress which (MkDigest a b c d) (MkDigest p q r s) = extractDigest output where
   input  = listArray (0,11) [ a,b,c,d , p,q,r,s , 0,0,0,0 ]
-  output = permutation input
+  output = permute which input
 
-keyedCompress :: Int -> Digest -> Digest -> Digest
-keyedCompress key (MkDigest a b c d) (MkDigest p q r s) = extractDigest output where
+keyedCompress ::  Hash -> Int -> Digest -> Digest -> Digest
+keyedCompress which key (MkDigest a b c d) (MkDigest p q r s) = extractDigest output where
   k = fromIntegral key :: F
   input  = listArray (0,11) [ a,b,c,d , p,q,r,s , k,0,0,0 ]
-  output = permutation input
+  output = permute which input
 
 --------------------------------------------------------------------------------
 
@@ -49,10 +49,10 @@ keyOdd    = 2 :: Key
 
 --------------------------------------------------------------------------------
 
-merkleRoot :: [Digest] -> Digest
-merkleRoot []  = error "merkleRoot: empty input"
-merkleRoot [x] = keyedCompress (keyBottom + keyOdd) x zeroDigest
-merkleRoot xs  = worker True xs where
+merkleRoot :: Hash -> [Digest] -> Digest
+merkleRoot which []  = error "merkleRoot: empty input"
+merkleRoot which [x] = keyedCompress which (keyBottom + keyOdd) x zeroDigest
+merkleRoot which xs  = worker True xs where
 
   worker :: Bool -> [Digest] -> Digest
   worker _        [x] = x
@@ -61,8 +61,8 @@ merkleRoot xs  = worker True xs where
     key0 = if isBottom then keyBottom else 0
 
     go :: [Digest] -> [Digest]
-    go (x:y:rest) = keyedCompress key0 x y : go rest
-    go [x]        = [ keyedCompress (key0 + keyOdd) x zeroDigest ]
+    go (x:y:rest) = keyedCompress which key0 x y : go rest
+    go [x]        = [ keyedCompress which (key0 + keyOdd) x zeroDigest ]
     go []         = []
 
 --------------------------------------------------------------------------------

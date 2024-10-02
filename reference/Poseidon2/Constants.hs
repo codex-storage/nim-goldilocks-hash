@@ -1,5 +1,5 @@
 
-module Constants where
+module Poseidon2.Constants where
 
 --------------------------------------------------------------------------------
 

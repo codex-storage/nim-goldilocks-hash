@@ -1,14 +1,14 @@
 
 {-# LANGUAGE Strict #-}
-module Poseidon2 where
+module Poseidon2.Permutation where
 
 --------------------------------------------------------------------------------
 
 import Data.Array (Array)
 import Data.Array.IArray
 
+import Poseidon2.Constants
 import Goldilocks
-import Constants
 import Common
 
 --------------------------------------------------------------------------------

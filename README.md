@@ -8,10 +8,9 @@ Experimental implementation of arithmetic hash functions (like for example
 Hash functions supported
 ------------------------
 
-- [x] Poseidon2 (t=12)
-- [ ] Monolith (t=12)
-- [ ] Tip4' (t=12)
-- [ ] Tip5 (t=16)
+- [x] Poseidon2 with `t=12`
+- [ ] Monolith with `t=12`
+- [ ] Tip4' with `t=12`
 
 The Poseidon2 implementation is compatible with [Horizen Lab's one][4].
 The Monolith implementation is compatible with [ZKFriendlyHashZoo][6].
@@ -33,20 +32,20 @@ Conventions
 Hash digests consist of 4 field elements (approximately 256 bits). 
 
 When constructing binary Merkle trees, we similarly work on units of 4 field 
-elements. We use a custom ``safe'' Merkle tree building convention, which ensures
-that different inputs can never produce the same Merkle root (except with 
+elements. We use a custom "safe" Merkle tree building convention, which ensures
+that different input sequences can never produce the same Merkle root (except with 
 negligible probability).
 
-When hashing bytes, first we pad the byte sequence to a multiple of 31 bytes using 
+When hashing bytes, first we pad the byte sequence to a multiple of 31 (or 62) bytes using 
 the `10*` padding strategy, and then we convert each 31 byte piece into 4 field 
-elements by using the lowest 62 bits. We do this for two reasons: 1) to be a 
-drop-in replacement for the BN254 implementation which also takes 31 bytes at 
-a time; and 2) because hashing 31/62 bytes with one permutation is almost 11% 
-more efficient than using only 28/56 bytes at a time.
+elements by filling their lowest 62 bits (note that 31 bytes = 248 bits = 4 x 62 bits). 
+We do this for two reasons: 1) to be a drop-in replacement for the BN254 implementation 
+which also takes 31 bytes at a time; and 2) because hashing 31 (or 62) bytes with one permutation 
+is almost 11% more efficient than using only 28 (or 56) bytes at a time.
 
 When hashing field elements, similarly we pad using the `10*` strategy. Domain
 separation ensures that using different sponge rates, or different types of
-input don't produce the same hash.
+input won't produce the same hash.
 
 
 Usage

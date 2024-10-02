@@ -11,6 +11,14 @@ import Goldilocks
 
 --------------------------------------------------------------------------------
 
+data Hash
+  = Poseidon2
+  | Monolith
+--  | Tip4'
+  deriving (Eq,Show)
+
+--------------------------------------------------------------------------------
+
 type State = Array Int F
 
 listToState :: [F] -> State
@@ -45,7 +53,7 @@ digestToBytes = concatMap bytesFromWord64LE . digestToWord64s
 bytesFromWord64LE :: Word64 -> [Word8]
 bytesFromWord64LE = go 0 where
   go 8  _  = []
-  go !k !w = fromIntegral (w .&. 0xff) : go (k+1) (shiftL w 8)
+  go !k !w = fromIntegral (w .&. 0xff) : go (k+1) (shiftR w 8)
 
 bytesToWord64LE :: [Word8] -> Word64
 bytesToWord64LE = fromInteger . bytesToIntegerLE

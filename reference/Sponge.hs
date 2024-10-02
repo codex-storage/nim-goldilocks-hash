@@ -30,7 +30,7 @@ import Data.Bits
 import Data.Word
 import Data.List
 
-import Poseidon2
+import Permutations
 import Goldilocks
 import Common
 
@@ -52,24 +52,13 @@ splitAndPadSequence r xs = go xs1 where
 
 --------------------------------------------------------------------------------
 
-hashFieldElems :: [F] -> Digest
-hashFieldElems = hashFieldElems' (Rate 8)
+hashFieldElems :: Hash -> [F] -> Digest
+hashFieldElems which = hashFieldElems' which (Rate 8)
 
-hashFieldElems' :: Rate -> [F] -> Digest
-hashFieldElems' rate@(Rate r) fels 
+hashFieldElems' :: Hash -> Rate -> [F] -> Digest
+hashFieldElems' which rate@(Rate r) fels 
   | r < 1 || r > 8  = error "the rate should be between 1 and 8"
-  | otherwise       = internalSponge 63 rate (splitAndPadSequence r fels) 
-  where
-{-
-    iv     = listArray (0,11) $ [ 0,0,0,0 , 0,0,0,0 , domSep,0,0,0 ] 
-    bits   = 64  -- input is a sequence of field elements, each approx 64 bits long 
-    domSep = fromIntegral (65536*bits + 256*t + r)
-    t      = 12
-    step  block state = permutation (addToState block state)
-    sponge list state = case list of
-      (this:rest) -> sponge rest (step this state)
-      []          -> state
--}
+  | otherwise       = internalSponge which 63 rate (splitAndPadSequence r fels) 
 
 -- | @nbits@ is how many bits is the size of a single element of the original input sequence.
 -- This is used for domain separation, which is encoded as @domSep = 65536*nbits + 256*t + r@.
@@ -82,14 +71,14 @@ hashFieldElems' rate@(Rate r) fels
 --
 --  * 63 for field element sequence
 --
-internalSponge :: Int -> Rate -> [[F]] -> Digest
-internalSponge nbits (Rate r) blocks = extractDigest (loop blocks iv) where
+internalSponge :: Hash -> Int -> Rate -> [[F]] -> Digest
+internalSponge which nbits (Rate r) blocks = extractDigest (loop blocks iv) where
   iv     = listArray (0,11) $ [ 0,0,0,0 , 0,0,0,0 , domSep,0,0,0 ] :: State
   domSep = fromIntegral (65536*nbits + 256*t + r) :: F
   t      = 12
 
   step :: [F] -> State -> State
-  step block state = permutation (addToState block state)
+  step block state = permute which (addToState block state)
 
   loop :: [[F]] -> State -> State
   loop list state = case list of
@@ -101,13 +90,13 @@ addToState xs arr = listArray (0,11) $ zipWith (+) (xs ++ repeat 0) (elems arr)
 
 --------------------------------------------------------------------------------
 
-hashBytes :: [Word8] -> Digest
-hashBytes = hashBytes' (Rate 8)
+hashBytes :: Hash -> [Word8] -> Digest
+hashBytes which = hashBytes' which (Rate 8)
 
-hashBytes' :: Rate -> [Word8] -> Digest
-hashBytes' rate input = case rate of
-  Rate 4 -> internalSponge nbits rate $ map decode31Bytes $ splitAndPadSequence 31 input
-  Rate 8 -> internalSponge nbits rate $ map decode62Bytes $ splitAndPadSequence 62 input
+hashBytes' :: Hash -> Rate -> [Word8] -> Digest
+hashBytes' which rate input = case rate of
+  Rate 4 -> internalSponge which nbits rate $ map decode31Bytes $ splitAndPadSequence 31 input
+  Rate 8 -> internalSponge which nbits rate $ map decode62Bytes $ splitAndPadSequence 62 input
   _      -> error "for hashing of byte sequences, we only support rate = 4 or 8"
   where
     nbits = 8
