@@ -10,4 +10,3 @@ func `*`* (x, y: F): F {. header: "../cbits/goldilocks.h", importc: "goldilocks_
 proc `+=`* (x: var F, y: F) = x = x + y
 proc `-=`* (x: var F, y: F) = x = x - y
 proc `*=`* (x: var F, y: F) = x = x * y
-

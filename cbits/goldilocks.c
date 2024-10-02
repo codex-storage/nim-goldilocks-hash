@@ -17,6 +17,11 @@ uint64_t goldilocks_add(uint64_t x, uint64_t y) {
   return ( (z >= GOLDILOCKS_PRIME) || (z<x) ) ? (z - GOLDILOCKS_PRIME) : z;
 }
 
+uint64_t goldilocks_add_to_uint64(uint64_t x, uint64_t y) {
+  uint64_t z = x + y;
+  return (z<x) ? (z - GOLDILOCKS_PRIME) : z;
+}
+
 uint64_t goldilocks_sub(uint64_t x, uint64_t y) {
   uint64_t z = x - y;
   return (z > x) ? (z + GOLDILOCKS_PRIME) : z;
@@ -78,6 +83,11 @@ uint64_t goldilocks_rdc_small(__uint128_t x) {
 uint64_t goldilocks_mul(uint64_t x, uint64_t y) {
   __uint128_t z = (__uint128_t)x * (__uint128_t)y;
   return goldilocks_rdc(z); 
+}
+
+uint64_t goldilocks_mul_to_uint64(uint64_t x, uint64_t y) {
+  __uint128_t z = (__uint128_t)x * (__uint128_t)y;
+  return goldilocks_rdc_to_uint64(z); 
 }
 
 uint64_t goldilocks_mul_add128(uint64_t x, uint64_t y, __uint128_t z) {
@@ -147,11 +157,11 @@ from <https://github.com/HorizenLabs/poseidon2/blob/main/plain_implementations/s
 */
 
 uint64_t goldilocks_poseidon2_sbox(uint64_t x0, uint64_t rc) {
-  uint64_t x  = goldilocks_add( x0 , rc );
-  uint64_t x2 = goldilocks_sqr( x       );
-  uint64_t x4 = goldilocks_sqr( x2      );
-  uint64_t x6 = goldilocks_mul( x4 , x2 );
-  uint64_t x7 = goldilocks_mul( x6 , x  );
+  uint64_t x  = goldilocks_add_to_uint64( x0 , rc );
+  uint64_t x2 = goldilocks_mul_to_uint64( x  , x  );
+  uint64_t x4 = goldilocks_mul_to_uint64( x2 , x2 );
+  uint64_t x6 = goldilocks_mul_to_uint64( x4 , x2 );
+  uint64_t x7 = goldilocks_mul          ( x6 , x  );
   return x7;
 }
 
