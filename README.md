@@ -9,7 +9,7 @@ Hash functions supported
 ------------------------
 
 - [x] Poseidon2 with `t=12`
-- [ ] Monolith with `t=12`
+- [x] Monolith with `t=12`
 - [ ] Tip4' with `t=12`
 
 The Poseidon2 implementation is compatible with [Horizen Lab's one][4].

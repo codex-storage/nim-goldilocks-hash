@@ -2,13 +2,13 @@
 import std/unittest
 
 import goldilocks_hash/types
-import goldilocks_hash/poseidon2/compress
+import goldilocks_hash/monolith/compress
 
 import ./compressTestCases
 
 #-------------------------------------------------------------------------------
 
-suite "poseidon2 compression":
+suite "monolith compression":
 
   test "compression of [1..4] and [5..8] with key=0":
     let input1 : Digest = toDigest(refInp1)

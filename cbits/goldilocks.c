@@ -26,43 +26,6 @@ uint64_t goldilocks_sub_safe(uint64_t x, uint64_t y) {
   return goldilocks_add( x , goldilocks_neg(y) );
 }
 
-/*
-
-// add together 3 field elements
-uint64_t goldilocks_add3( uint64_t x0, uint64_t x1, uint64_t x2 ) {
-  uint64_t x01 = goldilocks_add( x0 , x1  );
-  return goldilocks_add( x01, x2 );
-}
-
-//--------------------------------------
-
-uint64_t goldilocks_div_by_2(uint64_t x) {
-  return (x & 1) ? (x/2 + 0x7fffffff80000001) : (x/2);
-}
-
-uint64_t goldilocks_div_by_3(uint64_t x) {
-  uint64_t m = x % 3;
-  uint64_t r;
-  switch(m) {
-    case 0:
-      r = (x/3);
-      break;
-    case 1:
-      r = (x/3 + 0xaaaaaaaa00000001);      // (x+2*p) / 3 = x/3 + (2*p+1)/3
-      break;
-    case 2:
-      r = (x/3 + 0x5555555500000001);      // (x+p) / 3 = x/3 + (p+1)/3 
-      break;
-  }
-  return r;
-}
-
-uint64_t goldilocks_div_by_4(uint64_t x) {
-  return goldilocks_div_by_2(goldilocks_div_by_2(x));
-}
-
-*/
-
 //--------------------------------------
 
 uint64_t goldilocks_rdc(__uint128_t x) {
@@ -201,7 +164,6 @@ void goldilocks_poseidon2_internal_diffusion(uint64_t *inp, uint64_t *out) {
   s0 += inp[3]; s1 += inp[9];
   s0 += inp[4]; s1 += inp[10];
   s0 += inp[5]; s1 += inp[11];
-//  uint64_t s = goldilocks_rdc_small( s0 + s1 );
   __uint128_t s = s0 + s1;
 
   for(int i=0; i<12; i++) { 
@@ -211,8 +173,6 @@ void goldilocks_poseidon2_internal_diffusion(uint64_t *inp, uint64_t *out) {
 
 //--------------------------------------
 
-/*
-
 // multiplies a vector of size 4 by the 4x4 MDS matrix on the left:
 //
 //       [ 5 7 1 3 ]
@@ -220,74 +180,6 @@ void goldilocks_poseidon2_internal_diffusion(uint64_t *inp, uint64_t *out) {
 //       [ 1 3 5 7 ]
 //       [ 1 1 4 6 ]
 //
-void goldilocks_mul_by_M4(uint64_t *inp, uint64_t *out) {
-  uint64_t a = inp[0];
-  uint64_t b = inp[1];
-  uint64_t c = inp[2];
-  uint64_t d = inp[3];
-
-  uint64_t a2 = goldilocks_add( a  , a  );
-  uint64_t a4 = goldilocks_add( a2 , a2 );
-  uint64_t a5 = goldilocks_add( a4 , a  );
-
-  uint64_t b2 = goldilocks_add( b  , b  );
-  uint64_t b3 = goldilocks_add( b2 , b  );
-  uint64_t b6 = goldilocks_add( b3 , b3 );
-  uint64_t b7 = goldilocks_add( b6 , b  );
-
-  uint64_t c2 = goldilocks_add( c  , c  );
-  uint64_t c4 = goldilocks_add( c2 , c2 );
-  uint64_t c5 = goldilocks_add( c4 , c  );
-
-  uint64_t d2 = goldilocks_add( d  , d  );
-  uint64_t d3 = goldilocks_add( d2 , d  );
-  uint64_t d6 = goldilocks_add( d3 , d3 );
-  uint64_t d7 = goldilocks_add( d6 , d  );
-
-  out[0] = goldilocks_add( goldilocks_add( a5 , b7 ) , goldilocks_add( c  , d3 ) );
-  out[1] = goldilocks_add( goldilocks_add( a4 , b6 ) , goldilocks_add( c  , d  ) );
-  out[2] = goldilocks_add( goldilocks_add( a  , b3 ) , goldilocks_add( c5 , d7 ) );
-  out[3] = goldilocks_add( goldilocks_add( a  , b  ) , goldilocks_add( c4 , d6 ) );
-}
-
-// returns 2*a + b + c
-uint64_t goldilocks_weighted_add_211(uint64_t a, uint64_t b, uint64_t c) {
-  uint64_t a2 = goldilocks_add( a , a );
-  uint64_t bc = goldilocks_add( b , c );
-  return goldilocks_add( a2 , bc );
-}
-
-// multiplies by 12x12 block-circulant matrix [2*M4, M4, M4]
-void goldilocks_poseidon2_external_diffusion(uint64_t *inp, uint64_t *out) {
-  uint64_t us[4];
-  uint64_t vs[4];
-  uint64_t ws[4];
-
-  goldilocks_mul_by_M4( inp + 0 , us );
-  goldilocks_mul_by_M4( inp + 4 , vs );
-  goldilocks_mul_by_M4( inp + 8 , ws );
-
-  out[0]  = goldilocks_weighted_add_211( us[0] , vs[0] , ws[0] );
-  out[1]  = goldilocks_weighted_add_211( us[1] , vs[1] , ws[1] );
-  out[2]  = goldilocks_weighted_add_211( us[2] , vs[2] , ws[2] );
-  out[3]  = goldilocks_weighted_add_211( us[3] , vs[3] , ws[3] );
-
-  out[4]  = goldilocks_weighted_add_211( vs[0] , ws[0] , us[0] );
-  out[5]  = goldilocks_weighted_add_211( vs[1] , ws[1] , us[1] );
-  out[6]  = goldilocks_weighted_add_211( vs[2] , ws[2] , us[2] );
-  out[7]  = goldilocks_weighted_add_211( vs[3] , ws[3] , us[3] );
-
-  out[ 8] = goldilocks_weighted_add_211( ws[0] , us[0] , vs[0] );
-  out[ 9] = goldilocks_weighted_add_211( ws[1] , us[1] , vs[1] );
-  out[10] = goldilocks_weighted_add_211( ws[2] , us[2] , vs[2] );
-  out[11] = goldilocks_weighted_add_211( ws[3] , us[3] , vs[3] );
-}
-
-*/
-
-//--------------------------------------
-
-// multiplies a vector of size 4 by the 4x4 MDS matrix on the left
 void uint64_mul_by_M4(uint64_t *inp, uint64_t *out) {
   uint64_t a = inp[0];
   uint64_t b = inp[1];
@@ -520,6 +412,236 @@ void goldilocks_poseidon2_bytes_digest(int rate, int N, const uint8_t *input, ui
   goldilocks_convert_bytes_to_field_elements(rate, last, felts);
   for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] ,felts[j] ); }
   goldilocks_poseidon2_permutation( state );
+
+  for(int j=0; j<4; j++) { hash[j] = state[j]; }
+}
+
+//==============================================================================
+// *** Monolith hash ***
+//
+// compatible with <https://extgit.iaik.tugraz.at/krypto/zkfriendlyhashzoo>
+//
+
+/* 
+monolith test vector (permutation of [0..11]) 
+---------------------------------------------
+from <https://extgit.iaik.tugraz.at/krypto/zkfriendlyhashzoo/-/blob/master/plain_impls/src/monolith_64/monolith_64.rs?ref_type=heads#L653>
+
+0x516dd661e959f541 = 5867581605548782913
+0x082c137169707901 = 588867029099903233
+0x53dff3fd9f0a5beb = 6043817495575026667
+0x0b2ebaa261590650 = 805786589926590032
+0x89aadb57e2969cb6 = 9919982299747097782
+0x5d3d6905970259bd = 6718641691835914685
+0x6e5ac1a4c0cfa0fe = 7951881005429661950
+0xd674b7736abfc5ce = 15453177927755089358
+0x0d8697e1cd9a235f = 974633365445157727
+0x85fc4017c247136e = 9654662171963364206
+0x572bafd76e511424 = 6281307445101925412
+0xbec1638e28eae57f = 13745376999934453119
+
+*/
+
+//--------------------------------------
+// ** sbox layer
+
+// based on the reference implementation from 
+// <https://extgit.iaik.tugraz.at/krypto/zkfriendlyhashzoo>
+uint64_t goldilocks_monolith_single_bar(uint64_t x) {
+//  uint64_t y1 = ((x & 0x8080808080808080) >> 7) | ((x & 0x7F7F7F7F7F7F7F7F) << 1); 
+//  uint64_t y2 = ((x & 0xC0C0C0C0C0C0C0C0) >> 6) | ((x & 0x3F3F3F3F3F3F3F3F) << 2); 
+//  uint64_t y3 = ((x & 0xE0E0E0E0E0E0E0E0) >> 5) | ((x & 0x1F1F1F1F1F1F1F1F) << 3); 
+//  uint64_t z  = x ^ ((~y1) & y2 & y3);
+//  uint64_t r  = ((z  & 0x8080808080808080) >> 7) | ((z  & 0x7F7F7F7F7F7F7F7F) << 1);
+
+  const uint64_t mask80 = 0x8080808080808080;
+  const uint64_t mask7F = ~mask80;
+  uint64_t y1 = ((x  & mask80) >> 7) | ((x  & mask7F) << 1); 
+  uint64_t y2 = ((y1 & mask80) >> 7) | ((y1 & mask7F) << 1); 
+  uint64_t y3 = ((y2 & mask80) >> 7) | ((y2 & mask7F) << 1); 
+  uint64_t z  = x ^ ((~y1) & y2 & y3);
+  uint64_t r  = ((z  & mask80) >> 7) | ((z  & mask7F) << 1);
+  return r;
+}
+
+// the sbox-layer (note: it's only applied to the first 4 field elements!)
+void goldilocks_monolith_bars(uint64_t *state) {
+  for(int j=0; j<4; j++) { state[j] = goldilocks_monolith_single_bar(state[j]); }
+}
+
+//--------------------------------------
+// ** nonlinear layer
+
+// the nonlinear layer
+//
+// remark: since the next layer is always the linear diffusion, it's enough
+// to reduce to 64 bit, don't have to reduce to [0..p-1]. 
+// As in the linear layer we split into two 32 bit words anyway.
+void goldilocks_monolith_bricks(uint64_t *state) {
+  for(int i=11; i>0; i--) state[i] = goldilocks_sqr_add_to_uint64( state[i-1] , state[i] );
+}
+
+//--------------------------------------
+// ** fast diffusion layer
+
+#include "monolith_conv_uint64.inc"
+
+// we split the input to low and high 32 bit words
+// do circular convolution on them, which safe because there is no overflow in 64 bit words
+// but should be much faster as there are no modulo operations just 64-bit machine word ops
+// then reconstruct and reduce at the end
+void goldilocks_monolith_concrete(uint64_t *state) {
+  uint64_t lo[12];
+  uint64_t hi[12];
+ 
+  for(int i=0; i<12; i++) { 
+    uint64_t x = state[i];
+    lo[i] = x & 0xffffffff;
+    hi[i] = x >> 32;
+  }
+
+  uint64_circular_conv_12_with( lo , lo );
+  uint64_circular_conv_12_with( hi , hi );
+
+  for(int i=0; i<12; i++) {
+    __uint128_t x = (((__uint128_t)hi[i]) << 32) + lo[i];
+    state[i] = goldilocks_rdc_small(x);
+  }
+}
+
+void goldilocks_monolith_concrete_rc(uint64_t *state, const uint64_t *rc) {
+  uint64_t lo[12];
+  uint64_t hi[12];
+ 
+  for(int i=0; i<12; i++) { 
+    uint64_t x = state[i];
+    lo[i] = x & 0xffffffff;
+    hi[i] = x >> 32;
+  }
+
+  uint64_circular_conv_12_with( lo , lo );
+  uint64_circular_conv_12_with( hi , hi );
+
+  for(int i=0; i<12; i++) {
+    __uint128_t x = (((__uint128_t)hi[i]) << 32) + lo[i] + rc[i];
+    state[i] = goldilocks_rdc_small(x);
+  }
+}
+
+//--------------------------------------
+// ** rounds
+
+#include "monolith_constants.inc"
+
+void goldilocks_monolith_round(int round_idx, uint64_t *state) {
+  goldilocks_monolith_bars       (state);
+  goldilocks_monolith_bricks     (state);
+  goldilocks_monolith_concrete_rc(state , &(monolith_t12_round_constants[round_idx][0]) );
+}
+
+void goldilocks_monolith_permutation(uint64_t *state) {
+  // initial layer
+  goldilocks_monolith_concrete(state);
+  // five rounds with RC
+  for(int r=0; r<5; r++) {
+    goldilocks_monolith_round(r, state);
+  }
+  // last round, no RC
+  goldilocks_monolith_bars    (state);
+  goldilocks_monolith_bricks  (state);
+  goldilocks_monolith_concrete(state);
+}
+
+//------------------------------------------------------------------------------
+
+// compression function: input is two 4-element vector of field elements, 
+// and the output is a vector of 4 field elements
+void goldilocks_monolith_keyed_compress(const uint64_t *x, const uint64_t *y, uint64_t key, uint64_t *out) {
+  uint64_t state[12];
+  for(int i=0; i<4; i++) {
+    state[i  ] = x[i];
+    state[i+4] = y[i];
+    state[i+8] = 0;
+  }
+  state[8] = key;
+  goldilocks_monolith_permutation(state);
+  for(int i=0; i<4; i++) {
+    out[i] = state[i];
+  }
+}
+
+void goldilocks_monolith_compress(const uint64_t *x, const uint64_t *y, uint64_t *out) {
+  goldilocks_monolith_keyed_compress(x, y, 0, out);
+}
+
+//------------------------------------------------------------------------------
+
+// hash a sequence of field elements into a digest of 4 field elements
+void goldilocks_monolith_felts_digest(int rate, int N, const uint64_t *input, uint64_t *hash) {
+
+  assert( (rate >= 1) && (rate <= 8) );
+
+  uint64_t domsep = rate + 256*12 + 65536*63;
+  uint64_t state[12];
+  for(int i=0; i<12; i++) state[i] = 0;
+  state[8] = domsep;
+
+  int nchunks = (N + rate) / rate;       // 10* padding
+  const uint64_t *ptr = input;
+  for(int k=0; k<nchunks-1; k++) {
+    for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] , ptr[j] ); }
+    goldilocks_monolith_permutation( state );
+    ptr += rate;
+  }
+
+  int rem = nchunks*rate - N;       // 0 < rem <= rate
+  int ofs = rate - rem; 
+
+  // the last block, with padding
+  uint64_t last[8];
+  for(int i=0    ; i<ofs ; i++) last[i] = ptr[i];
+  for(int i=ofs+1; i<rate; i++) last[i] = 0;
+  last[ofs] = 0x01;
+  for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] , last[j] ); }
+  goldilocks_monolith_permutation( state );
+
+  for(int j=0; j<4; j++) { hash[j] = state[j]; }
+}
+
+//--------------------------------------
+
+void goldilocks_monolith_bytes_digest(int rate, int N, const uint8_t *input, uint64_t *hash) {
+
+  assert( (rate == 4) || (rate == 8) );
+
+  uint64_t domsep = rate + 256*12 + 65536*8;
+  uint64_t state[12];
+  for(int i=0; i<12; i++) state[i] = 0;
+  state[8] = domsep;
+
+  uint64_t felts[8];
+
+  int rate_in_bytes  = 31 * (rate>>2);                   // 31 or 62
+  int nchunks = (N + rate_in_bytes) / rate_in_bytes;     // 10* padding
+  const uint8_t *ptr = input;
+  for(int k=0; k<nchunks-1; k++) {
+    goldilocks_convert_bytes_to_field_elements(rate, ptr, felts);
+    for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] , felts[j] ); }
+    goldilocks_monolith_permutation( state );
+    ptr += rate_in_bytes;
+  }
+
+  int rem = nchunks*rate_in_bytes - N;       // 0 < rem <= rate_in_bytes 
+  int ofs = rate_in_bytes - rem; 
+  uint8_t last[62];
+
+  // last block, with padding
+  for(int i=0    ; i<ofs          ; i++) last[i] = ptr[i];
+  for(int i=ofs+1; i<rate_in_bytes; i++) last[i] = 0;
+  last[ofs] = 0x01;
+  goldilocks_convert_bytes_to_field_elements(rate, last, felts);
+  for(int j=0; j<rate; j++) { state[j] = goldilocks_add( state[j] ,felts[j] ); }
+  goldilocks_monolith_permutation( state );
 
   for(int j=0; j<4; j++) { hash[j] = state[j]; }
 }

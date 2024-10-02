@@ -40,6 +40,12 @@ extractDigest :: State -> Digest
 extractDigest state = case elems state of 
   (a:b:c:d:_) -> MkDigest a b c d
 
+listToDigest :: [F] -> Digest
+listToDigest [a,b,c,d] = MkDigest a b c d
+
+digestToList :: Digest -> [F]
+digestToList (MkDigest a b c d) = [a,b,c,d]
+
 --------------------------------------------------------------------------------
 
 digestToWord64s :: Digest -> [Word64]
