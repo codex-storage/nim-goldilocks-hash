@@ -10,5 +10,3 @@ func compress*(a, b: Digest, key: uint64 = 0) : Digest =
   var output: Digest
   c_compress(x,y,key,output)
   return output
-
-

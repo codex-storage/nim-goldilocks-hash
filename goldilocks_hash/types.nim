@@ -7,8 +7,8 @@ type F* = distinct uint64
 
 func fromF* (x: F): uint64 = return uint64(x)
 func toF*   (x: uint64): F = return F(x)
-func toF*   (x: int   ): F = 
-  assert(x >= 0) 
+func toF*   (x: int   ): F =
+  assert(x >= 0)
   return F(uint64(x))
 
 func `==`* (x, y: F): bool =  return (uint64(x) == uint64(y))
@@ -31,8 +31,8 @@ type F12* = array[12, F]
 type Digest* = distinct F4
 type State*  = distinct F12
 
-func fromDigest* (x : Digest): F4  = return F4(x)  
-func fromState * (x : State):  F12 = return F12(x) 
+func fromDigest* (x : Digest): F4  = return F4(x)
+func fromState * (x : State):  F12 = return F12(x)
 
 func toDigest* (x : F4 ): Digest = Digest(x)
 func toState*  (x : F12): State  = State(x)
