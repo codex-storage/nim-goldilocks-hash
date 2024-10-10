@@ -97,18 +97,18 @@ func digestNim*(rate: static int = 8, elements: openArray[F]): Digest =
 
 #---------------------------------------
 
-proc digestFeltsRawC(rate: int, len: int, input: ptr UncheckedArray[F   ], hash: var F4) {. header: "../cbits/goldilocks.h", importc: "goldilocks_monolith_felts_digest", cdecl .}
-proc digestBytesRawC(rate: int, len: int, input: ptr UncheckedArray[byte], hash: var F4) {. header: "../cbits/goldilocks.h", importc: "goldilocks_monolith_bytes_digest", cdecl .}
+proc digestFeltsRawC(rate: int, len: int, input: ptr F   , hash: var F4) {. header: "../cbits/goldilocks.h", importc: "goldilocks_monolith_felts_digest", cdecl .}
+proc digestBytesRawC(rate: int, len: int, input: ptr byte, hash: var F4) {. header: "../cbits/goldilocks.h", importc: "goldilocks_monolith_bytes_digest", cdecl .}
 
 func digestFeltsC*(rate: static int = 8, felts: openArray[F]): Digest =
   var digest : F4
-  let input = cast[ptr UncheckedArray[F]]( felts.unsafeAddr )
+  let input = if felts.len > 0: unsafeAddr felts[0] else: nil
   digestFeltsRawC(rate, felts.len, input, digest)
   return toDigest(digest)
 
 func digestBytesC*(rate: static int = 8, bytes: openArray[byte]): Digest =
   var digest : F4
-  let input = cast[ptr UncheckedArray[byte]]( bytes.unsafeAddr )
+  let input = if bytes.len > 0: unsafeAddr bytes[0] else: nil
   digestBytesRawC(rate, bytes.len, input, digest)
   return toDigest(digest)
 
