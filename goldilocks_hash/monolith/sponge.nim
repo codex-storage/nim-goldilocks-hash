@@ -8,20 +8,10 @@
 # as many zeros as required so that the final length is divisible by the rate)
 # both when hashing bytes and when hashing field elements
 
-#import std/assertions       # on 1.6.18 with an M2 i got "cannot open file: std/assertions" ....
-
 import ../types
 import ../goldilocks
 import ./permutation
 #import ./io
-
-#-------------------------------------------------------------------------------
-
-# "import std/assertions" does not work    
-# i got the error: "cannot open file: std/assertions" 
-proc fakeAssert( cond: bool, msg: string ) =
-  if not cond:
-    raise newException(AssertionDefect, msg)
 
 #-------------------------------------------------------------------------------
 
@@ -30,14 +20,14 @@ type
     state:      F12
     lenModRate: uint
 
-func numberOfBits(T: static typedesc): int = 
+func numberOfBits(T: static typedesc): int =
   if T is F:    return 63
   if T is byte: return 8
   if T is bool: return 1
-  fakeAssert( false , "unsupported input type for sponge construction" )
+  raiseAssert("unsupported input type for sponge construction" )
 
 func initialize[T: static typedesc, rate: static int](sponge: var Sponge[T,rate]) =
-  fakeAssert( rate >= 1 and rate <= 8 , "with t=12, rate must be at most 8 (and positive)" )
+  doAssert(rate >= 1 and rate <= 8, "with t=12, rate must be at most 8 (and positive)" )
   let nbits = numberOfBits(T)
   let IV = toF( 0x10000*uint64(nbits) + 0x100*12 + uint64(rate) )  # domain separation IV := (65536*nbits + 256*t + r)
   sponge.state[8] = IV; 
