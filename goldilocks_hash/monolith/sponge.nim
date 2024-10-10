@@ -16,11 +16,11 @@ import ./permutation
 #-------------------------------------------------------------------------------
 
 type
-  Sponge*[T: static typedesc, rate: static int] = object
+  Sponge*[T: type, rate: static int] = object
     state:      F12
     lenModRate: uint
 
-func numberOfBits(T: static typedesc): int {.compileTime.} =
+func numberOfBits(T: type): int {.compileTime.} =
   when T is F:
     63
   elif T is byte:
@@ -30,32 +30,32 @@ func numberOfBits(T: static typedesc): int {.compileTime.} =
   else:
     {.error: "unsupported input type for sponge construction".}
 
-func initialize[T: static typedesc, rate: static int](sponge: var Sponge[T,rate]) =
-  when not rate >= 1 and rate <= 8:
+func initialize(sponge: var Sponge) =
+  when not Sponge.rate >= 1 and Sponge.rate <= 8:
     {.error: "with t=12, rate must be at most 8 (and positive)".}
-  const nbits = numberOfBits(T)
-  const IV = toF( 0x10000*uint64(nbits) + 0x100*12 + uint64(rate) )  # domain separation IV := (65536*nbits + 256*t + r)
+  const nbits = numberOfBits(Sponge.T)
+  const IV = toF( 0x10000*uint64(nbits) + 0x100*12 + uint64(Sponge.rate) )  # domain separation IV := (65536*nbits + 256*t + r)
   sponge.state[8] = IV;
 
 #---------------------------------------
 
-func extractDigestF4[T: static typedesc, rate: static int](sponge: var Sponge[T,rate]) : F4 =
+func extractDigestF4(sponge: var Sponge) : F4 =
   var digest : F4
   for i in 0..<4: digest[i] = sponge.state[i]
   return digest
 
-func extractDigest[T: static typedesc, rate: static int](sponge: var Sponge[T,rate]) : Digest =
+func extractDigest(sponge: var Sponge) : Digest =
   return toDigest(sponge.extractDigestF4())
 
 #---------------------------------------
 
-func update*[rate: static int](sponge: var Sponge[typedesc[F],rate], x: F) =
+func update*[rate](sponge: var Sponge[F, rate], x: F) =
   sponge.state[sponge.lenModRate] += x
   sponge.lenModRate = (sponge.lenModRate + 1) mod rate
   if (sponge.lenModRate == 0):
     permInPlaceF12( sponge.state );
 
-func finish*[T: static typedesc, rate:static int](sponge: var Sponge[T,rate]): Digest =
+func finish*(sponge: var Sponge): Digest =
   # padding
   sponge.update(one)
   while( sponge.lenModRate != 0):
@@ -72,18 +72,18 @@ func finish*[T: static typedesc, rate:static int](sponge: var Sponge[T,rate]): D
 #  initialize[T,rate](sponge)
 #  return sponge
 
-func initSponge*[T: static typedesc, rate: static int = 8](): Sponge[T,rate] =
+func init*(_: type Sponge, T: type, rate: static int): Sponge[T,rate] =
   when (rate < 1 or rate > 8):
     {.error: "only rates between 1 and 8 are supported".}
-  var sponge: Sponge[T,rate]
-  initialize[T,rate](sponge)
+  var sponge: Sponge[T, rate]
+  initialize(sponge)
   return sponge
 
 #---------------------------------------
 
 # digest a sequence of field elements
 func digestNim*(rate: static int = 8, elements: openArray[F]): Digest =
-  var sponge : Sponge[typedesc[F],rate] = initSponge[typedesc[F],rate]()
+  var sponge : Sponge[F,rate] = Sponge.init(F, rate)
   for element in elements:
     sponge.update(element)
   return sponge.finish()
