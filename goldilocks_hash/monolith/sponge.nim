@@ -72,7 +72,7 @@ func finish*[T: static typedesc, rate:static int](sponge: var Sponge[T,rate]): D
 #  initialize[T,rate](sponge)
 #  return sponge
 
-func newSponge*[T: static typedesc, rate: static int = 8](): Sponge[T,rate] =
+func initSponge*[T: static typedesc, rate: static int = 8](): Sponge[T,rate] =
   when (rate < 1 or rate > 8):
     {.error: "only rates between 1 and 8 are supported".}
   var sponge: Sponge[T,rate]
@@ -83,7 +83,7 @@ func newSponge*[T: static typedesc, rate: static int = 8](): Sponge[T,rate] =
 
 # digest a sequence of field elements
 func digestNim*(rate: static int = 8, elements: openArray[F]): Digest =
-  var sponge : Sponge[typedesc[F],rate] = newSponge[typedesc[F],rate]()
+  var sponge : Sponge[typedesc[F],rate] = initSponge[typedesc[F],rate]()
   for element in elements:
     sponge.update(element)
   return sponge.finish()
