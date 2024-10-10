@@ -30,7 +30,7 @@ func initialize[T: static typedesc, rate: static int](sponge: var Sponge[T,rate]
   doAssert(rate >= 1 and rate <= 8, "with t=12, rate must be at most 8 (and positive)" )
   let nbits = numberOfBits(T)
   let IV = toF( 0x10000*uint64(nbits) + 0x100*12 + uint64(rate) )  # domain separation IV := (65536*nbits + 256*t + r)
-  sponge.state[8] = IV; 
+  sponge.state[8] = IV;
 
 #---------------------------------------
 
@@ -59,7 +59,7 @@ func finish*[T: static typedesc, rate:static int](sponge: var Sponge[T,rate]): D
 
 #-------------------------------------------------------------------------------
 
-# # _: type Sponge, 
+# # _: type Sponge,
 #func init*( _: type Sponge, T: static typedesc, rate: static int = 8): Sponge[T,rate] =
 #  when (rate < 1 or rate > 8):
 #    {.error: "only rates between 1 and 8 are supported".}
