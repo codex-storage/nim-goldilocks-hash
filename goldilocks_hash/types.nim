@@ -34,11 +34,16 @@ type State*  = distinct F12
 func fromDigest* (x : Digest): F4  = return F4(x)
 func fromState * (x : State):  F12 = return F12(x)
 
-func toDigest* (x : F4 ): Digest = Digest(x)
-func toState*  (x : F12): State  = State(x)
+func toDigest*   (x : F4 ): Digest = Digest(x)
+func toState*    (x : F12): State  = State(x)
 
-func mkDigestU64* (a,b,c,d: uint64): Digest = toDigest( [toF(a),toF(b),toF(c),toF(d) ] )
-func mkDigest*    (a,b,c,d: F     ): Digest = toDigest( [a,b,c,d] )
+func mkDigest*   (a,b,c,d: F): Digest = toDigest( [a,b,c,d] )
+
+func mkDigestU64*(a,b,c,d: uint64): Digest = toDigest( [toF(a),toF(b),toF(c),toF(d) ] )
+func toDigestU64*(x : array[4,uint64]): Digest = mkDigestU64( x[0], x[1], x[2], x[3] )
+
+func uint64ToDigest*(x: uint64): Digest = mkDigestU64( x,0,0,0 )
+func intToDigest*   (x: uint64): Digest = uint64ToDigest( uint64(x) )
 
 const zeroDigest* : Digest = mkDigestU64(0,0,0,0)
 
@@ -50,9 +55,27 @@ proc `$`*(x: Digest): string = return $(fromDigest(x))
 
 #-------------------------------------------------------------------------------
 
+func digestSeqToFeltSeq*( ds: seq[Digest] ): seq[F] = 
+  let n = ds.len
+  var output: seq[F] = newSeq[F]( 4*n )
+  for k in 0..<n:
+    let f4 = fromDigest( ds[k] )
+    let j = 4*k
+    output[j+0] = f4[0]
+    output[j+1] = f4[1]
+    output[j+2] = f4[2]
+    output[j+3] = f4[3]
+  return output
+
+#-------------------------------------------------------------------------------
+
 func numberOfBits*(T: type): int {.compileTime.} =
   when T is F:
     63
+#  elif T is uint32:
+#    32
+#  elif T is uint16:
+#    16
   elif T is byte:
     8
   elif T is bool:
