@@ -20,16 +20,6 @@ type
     state:      F12
     lenModRate: uint
 
-func numberOfBits(T: type): int {.compileTime.} =
-  when T is F:
-    63
-  elif T is byte:
-    8
-  elif T is bool:
-    1
-  else:
-    {.error: "unsupported input type for sponge construction".}
-
 func initialize(sponge: var Sponge) =
   when not Sponge.rate >= 1 and Sponge.rate <= 8:
     {.error: "with t=12, rate must be at most 8 (and positive)".}
@@ -63,14 +53,6 @@ func finish*(sponge: var Sponge): Digest =
   return sponge.extractDigest()
 
 #-------------------------------------------------------------------------------
-
-# # _: type Sponge,
-#func init*( _: type Sponge, T: static typedesc, rate: static int = 8): Sponge[T,rate] =
-#  when (rate < 1 or rate > 8):
-#    {.error: "only rates between 1 and 8 are supported".}
-#  var sponge: Sponge[T,rate]
-#  initialize[T,rate](sponge)
-#  return sponge
 
 func init*(_: type Sponge, T: type, rate: static int): Sponge[T,rate] =
   when (rate < 1 or rate > 8):

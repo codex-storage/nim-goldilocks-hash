@@ -49,3 +49,15 @@ proc `$`*(x: State ): string = return $(fromState(x))
 proc `$`*(x: Digest): string = return $(fromDigest(x))
 
 #-------------------------------------------------------------------------------
+
+func numberOfBits*(T: type): int {.compileTime.} =
+  when T is F:
+    63
+  elif T is byte:
+    8
+  elif T is bool:
+    1
+  else:
+    {.error: "unsupported input type for sponge construction".}
+
+#-------------------------------------------------------------------------------
