@@ -26,13 +26,25 @@ perms varname f xs = unlines (header : stuff ++ footer) where
 
 --------------------------------------------------------------------------------
 
-testStates :: [State]
-testStates = 
-  [ listToState [ fromInteger (a + b*i) | i<-[0..11] ]
+testStates12 :: [State]
+testStates12 = 
+  [ listToState' 12 [ fromInteger (a + b*i) | i<-[0..11] ]
   | a <- [0,10,200,3000]
   , b <- [1, 7, 23, 666]
   ]
 
+testStates16 :: [State]
+testStates16 = 
+  [ listToState' 16 [ fromInteger (a + b*i) | i<-[0..15] ]
+  | a <- [0,10,200,3000]
+  , b <- [1, 7, 23, 666]
+  ]
+
+testStates :: Hash -> [State]
+testStates hash = case hashT hash of
+  12 -> testStates12
+  16 -> testStates16
+  
 --------------------------------------------------------------------------------
 
 printTests :: Hash -> IO ()
@@ -40,7 +52,7 @@ printTests hash = hPrintTests stdout hash
 
 hPrintTests :: Handle -> Hash -> IO ()
 hPrintTests h hash = hPutStrLn h $ unlines 
-  [ perms "testcases_perm" (permute hash) testStates
+  [ perms "testcases_perm" (permute hash) (testStates hash)
   ]
 
 writeTests :: Hash -> IO ()

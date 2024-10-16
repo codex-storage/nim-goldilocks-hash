@@ -37,13 +37,13 @@ sboxField = toF . bytesToWord64LE . map sboxByte . bytesFromWord64LE . fromF
 
 bars :: State -> State
 bars old = case splitAt 4 (elems old) of
-  (four,eight) -> listToState (map sboxField four ++ eight)
+  (four,eight) -> listToState' 12 (map sboxField four ++ eight)
 
 bricks :: State -> State
-bricks old = listToState $ zipWith (+) (0 : map square xs) xs where xs = elems old
+bricks old = listToState' 12 $ zipWith (+) (0 : map square xs) xs where xs = elems old
 
 concrete' :: [F] -> State -> State
-concrete' rcs = listToState . zipWith (+) rcs . elems . linearDiffusion
+concrete' rcs = listToState' 12 . zipWith (+) rcs . elems . linearDiffusion
 
 concrete :: Int -> State -> State
 concrete ridx = concrete' [ monolithRoundConstants ! (ridx,j) | j<-[0..11] ]
@@ -51,10 +51,10 @@ concrete ridx = concrete' [ monolithRoundConstants ! (ridx,j) | j<-[0..11] ]
 --------------------------------------------------------------------------------
 
 circulantRow :: State
-circulantRow = listToState [ 7, 23, 8, 26, 13, 10, 9, 7, 6, 22, 21, 8 ]
+circulantRow = listToState' 12 [ 7, 23, 8, 26, 13, 10, 9, 7, 6, 22, 21, 8 ]
 
 linearDiffusion :: State -> State
-linearDiffusion old = listToState 
+linearDiffusion old = listToState' 12 
   [ sum [ old!j * circulantRow!(mod (j-k) 12) | j<-[0..11] ]
   | k <- [0..11]
   ]

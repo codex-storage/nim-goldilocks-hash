@@ -1,5 +1,5 @@
 
-{-| Merkle tree construction
+{-| Merkle tree construction (using a T=12 hash)
 
 Conventions:
 

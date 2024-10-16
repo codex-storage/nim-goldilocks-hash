@@ -12,20 +12,33 @@ import Goldilocks
 --------------------------------------------------------------------------------
 
 data Hash
-  = Poseidon2
+  = Poseidon2_T12
+  | Poseidon2_T16
   | Monolith
 --  | Tip4'
   deriving (Eq,Show)
+
+hashT :: Hash -> Int
+hashT hash = case hash of
+  Poseidon2_T12 -> 12 
+  Poseidon2_T16 -> 16
+  Monolith      -> 12
 
 --------------------------------------------------------------------------------
 
 type State = Array Int F
 
-listToState :: [F] -> State
-listToState = listArray (0,11)
+listToState' :: Int -> [F] -> State
+listToState' n = listArray (0,n-1)
 
-zeroState :: State
-zeroState = listToState (replicate 12 0)
+listToState :: Hash -> [F] -> State
+listToState hash = listToState' (hashT hash)
+
+zeroState' :: Int -> State
+zeroState' n = listToState' n (replicate n 0)
+
+zeroState :: Hash -> State
+zeroState hash = zeroState' (hashT hash)
 
 --------------------------------------------------------------------------------
 

@@ -1,15 +1,36 @@
 
 {-# LANGUAGE Strict #-}
-module Poseidon2.Permutation where
+module Poseidon2.T12.Permutation where
 
 --------------------------------------------------------------------------------
+
+import Data.Word
 
 import Data.Array (Array)
 import Data.Array.IArray
 
-import Poseidon2.Constants
+import Poseidon2.T12.Constants
 import Goldilocks
 import Common
+
+--------------------------------------------------------------------------------
+
+-- | permutation of @[0..15]@, from HorizenLabs Rust impl
+kats :: [Word64]
+kats = 
+  [ 0x01eaef96bdf1c0c1
+  , 0x1f0d2cc525b2540c
+  , 0x6282c1dfe1e0358d
+  , 0xe780d721f698e1e6
+  , 0x280c0b6f753d833b
+  , 0x1b942dd5023156ab
+  , 0x43f0df3fcccb8398
+  , 0xe8e8190585489025
+  , 0x56bdbf72f77ada22
+  , 0x7911c32bf9dcd705
+  , 0xec467926508fbe67
+  , 0x6a50450ddf85a6ed
+  ]
 
 --------------------------------------------------------------------------------
 

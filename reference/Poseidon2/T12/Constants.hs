@@ -1,5 +1,5 @@
 
-module Poseidon2.Constants where
+module Poseidon2.T12.Constants where
 
 --------------------------------------------------------------------------------
 
