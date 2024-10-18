@@ -43,7 +43,7 @@ func mkDigestU64*(a,b,c,d: uint64): Digest = toDigest( [toF(a),toF(b),toF(c),toF
 func toDigestU64*(x : array[4,uint64]): Digest = mkDigestU64( x[0], x[1], x[2], x[3] )
 
 func uint64ToDigest*(x: uint64): Digest = mkDigestU64( x,0,0,0 )
-func intToDigest*   (x: uint64): Digest = uint64ToDigest( uint64(x) )
+func intToDigest*   (x: int   ): Digest = uint64ToDigest( uint64(x) )
 
 const zeroDigest* : Digest = mkDigestU64(0,0,0,0)
 
