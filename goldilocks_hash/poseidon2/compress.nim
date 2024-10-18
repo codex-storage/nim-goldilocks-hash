@@ -1,7 +1,7 @@
 
 import ../types
 
-proc c_compress(a, b: var Digest, key: uint64, output: var Digest) {. header: "../cbits/goldilocks.h", importc: "goldilocks_poseidon2_keyed_compress", cdecl .}
+proc c_compress(a, b: var Digest, key: uint64, output: var Digest) {. header: "../goldilocks_hash/cbits/goldilocks.h", importc: "goldilocks_poseidon2_keyed_compress", cdecl .}
 
 # keyed compression function
 func compress*(a, b: Digest, key: uint64 = 0) : Digest =

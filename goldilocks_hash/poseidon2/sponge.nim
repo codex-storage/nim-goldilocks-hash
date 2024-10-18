@@ -79,8 +79,8 @@ func digestNim*(rate: static int = 8, elements: openArray[F]): Digest =
 
 #---------------------------------------
 
-proc digestFeltsRawC(rate: int, len: int, input: ptr F   , hash: var F4) {. header: "../cbits/goldilocks.h", importc: "goldilocks_poseidon2_felts_digest", cdecl .}
-proc digestBytesRawC(rate: int, len: int, input: ptr byte, hash: var F4) {. header: "../cbits/goldilocks.h", importc: "goldilocks_poseidon2_bytes_digest", cdecl .}
+proc digestFeltsRawC(rate: int, len: int, input: ptr F   , hash: var F4) {. header: "../goldilocks_hash/cbits/goldilocks.h", importc: "goldilocks_poseidon2_felts_digest", cdecl .}
+proc digestBytesRawC(rate: int, len: int, input: ptr byte, hash: var F4) {. header: "../goldilocks_hash/cbits/goldilocks.h", importc: "goldilocks_poseidon2_bytes_digest", cdecl .}
 
 func digestFeltsC*(rate: static int = 8, felts: openArray[F]): Digest =
   var digest : F4
