@@ -6,6 +6,7 @@ import ./types
 # build system hack
 
 const
+  # REMARK: currentSourcePath = ~/.nimble/pkgs/goldilocks_hash-0.0.1/goldilocks_hash/goldilocks.nim
   root = currentSourcePath.parentDir.parentDir
 
 {. passc: "-I" & root & "/cbits" .}

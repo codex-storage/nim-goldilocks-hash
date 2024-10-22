@@ -1,4 +1,5 @@
 
+import std/sequtils
 import std/strformat
 
 #-------------------------------------------------------------------------------
@@ -55,6 +56,15 @@ proc `$`*(x: Digest): string = return $(fromDigest(x))
 
 #-------------------------------------------------------------------------------
 
+func digestToFeltSeq*( d: Digest ): seq[F] = 
+  var output: seq[F] = newSeq[F]( 4 )
+  let f4 = fromDigest( d )
+  output[0] = f4[0]
+  output[1] = f4[1]
+  output[2] = f4[2]
+  output[3] = f4[3]
+  return output
+
 func digestSeqToFeltSeq*( ds: seq[Digest] ): seq[F] = 
   let n = ds.len
   var output: seq[F] = newSeq[F]( 4*n )
@@ -66,6 +76,9 @@ func digestSeqToFeltSeq*( ds: seq[Digest] ): seq[F] =
     output[j+2] = f4[2]
     output[j+3] = f4[3]
   return output
+
+func digestSeqToFeltSeqSeq*( ds: seq[Digest] ): seq[seq[F]] 
+  = ds.map(digestToFeltSeq)
 
 #-------------------------------------------------------------------------------
 
